@@ -1,0 +1,16 @@
+language: bash
+
+services:
+  - docker
+
+before_script:
+  - make image
+
+script:
+  - make test
+
+deploy:
+  provider: script
+  script: make release TAG=$TRAVIS_TAG
+  on:
+    tags: true
