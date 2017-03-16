@@ -155,7 +155,7 @@ assert_file_exists() {
       ssh-keyscan -t ecdsa git >>~/.ssh/known_hosts && \
       chmod 700 ~/.ssh && \
       chmod 600 ~/.ssh/id_rsa && \
-      ssh -v git@git -i ~/.ssh/id_rsa git init --bare test.git && \
+      ssh git@git git init --bare test.git && \
       git clone git@git:test.git ~/test && \
       cd ~/test && \
       touch README.md && \
