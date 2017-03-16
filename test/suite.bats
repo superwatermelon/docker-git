@@ -6,10 +6,7 @@ setup() {
   export SSH_DIR="$TMP/ssh"
   export GIT_REFERENCE_DIR="$TMP/ref/git"
   export GIT_DIR="$TMP/git"
-  mkdir -p "$SSH_REFERENCE_DIR"
-  mkdir -p "$SSH_DIR"
-  mkdir -p "$GIT_REFERENCE_DIR"
-  mkdir -p "$GIT_DIR"
+  mkdir -p "$SSH_REFERENCE_DIR" "$SSH_DIR" "$GIT_REFERENCE_DIR" "$GIT_DIR"
 }
 
 teardown() {
