@@ -22,8 +22,8 @@ run_container_with_git_bind_mount() {
 }
 
 apply_reference_files() {
-  cp -r "$SSH_REFERENCE_DIR/" "$SSH_DIR/"
-  cp -r "$GIT_REFERENCE_DIR/" "$GIT_DIR/"
+  cp -a "$SSH_REFERENCE_DIR/." "$SSH_DIR"
+  cp -a "$GIT_REFERENCE_DIR/." "$GIT_DIR"
 }
 
 generate_sshd_config() {
@@ -93,6 +93,7 @@ assert_file_exists() {
 
 @test "does not overwrite host provided sshd_config" {
   generate_sshd_config
+  assert_ssh_file_unchanged "sshd_config"
   run_container_with_ssh_bind_mount
   assert_ssh_file_unchanged "sshd_config"
 }
