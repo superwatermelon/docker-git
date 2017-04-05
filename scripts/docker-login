@@ -1,0 +1,4 @@
+#!/bin/bash
+# Usage:
+#   DOCKER_USERNAME=example DOCKER_PASSWORD=password docker-login
+docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD
