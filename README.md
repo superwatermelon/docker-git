@@ -85,4 +85,4 @@ git clone git@git.example.com:myrepo.git
 
 [travis-ci]: https://travis-ci.org/superwatermelon/docker-git.svg?branch=master
 [git-scm]: https://git-scm.com/
-[docker-hub]: https://hub.docker.com/r/superwatermelon/fluentd-elasticsearch
+[docker-hub]: https://hub.docker.com/r/superwatermelon/git
