@@ -1,6 +1,10 @@
 # Git Docker Image
 
-Docker image for serving Git repositories over SSH.
+![Build on Travis CI][travis-ci]
+
+Docker image for serving [Git][git-scm] repositories over SSH.
+
+View on [Docker Hub][docker-hub].
 
 ### Basic usage
 
@@ -78,3 +82,7 @@ Clone as normal:
 ```
 git clone git@git.example.com:myrepo.git
 ```
+
+[travis-ci]: https://travis-ci.org/superwatermelon/docker-git.svg?branch=master
+[git-scm]: https://git-scm.com/
+[docker-hub]: https://hub.docker.com/r/superwatermelon/fluentd-elasticsearch
