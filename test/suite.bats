@@ -12,7 +12,7 @@ setup() {
 }
 
 teardown() {
-  [[ -d "$TMP" ]] && sudo rm -rf "$TMP"/*
+  [[ -d "$TMP" ]] && sudo rm -rf "$TMP"
 }
 
 run_container_with_ssh_bind_mount() {
@@ -34,18 +34,17 @@ generate_sshd_config() {
 }
 
 generate_host_keys() {
-  ssh-keygen -q -N '' -C '' -t rsa -f "$SSH_REFERENCE_DIR/ssh_host_rsa_key"
-  ssh-keygen -q -N '' -C '' -t dsa -f "$SSH_REFERENCE_DIR/ssh_host_dsa_key"
-  ssh-keygen -q -N '' -C '' -t ecdsa -f "$SSH_REFERENCE_DIR/ssh_host_ecdsa_key"
-  ssh-keygen -q -N '' -C '' -t ed25519 -f "$SSH_REFERENCE_DIR/ssh_host_ed25519_key"
+  ssh-keygen -q -N '' -t rsa -f "$SSH_REFERENCE_DIR/ssh_host_rsa_key"
+  ssh-keygen -q -N '' -t dsa -f "$SSH_REFERENCE_DIR/ssh_host_dsa_key"
+  ssh-keygen -q -N '' -t ecdsa -f "$SSH_REFERENCE_DIR/ssh_host_ecdsa_key"
+  ssh-keygen -q -N '' -t ed25519 -f "$SSH_REFERENCE_DIR/ssh_host_ed25519_key"
   apply_reference_files
 }
 
 generate_authorized_keys() {
-  ssh-keygen -q -N '' -C '' -t rsa -f "$GIT_REFERENCE_DIR/id_rsa"
+  ssh-keygen -q -N '' -t rsa -f "$GIT_REFERENCE_DIR/id_rsa"
   mkdir -p "$GIT_REFERENCE_DIR/.ssh"
   cat "$GIT_REFERENCE_DIR/id_rsa.pub" >"$GIT_REFERENCE_DIR/.ssh/authorized_keys"
-  sudo chown -R "$GIT_UID:$GIT_GID" "$GIT_REFERENCE_DIR/.ssh"
   sudo chmod 700 "$GIT_REFERENCE_DIR/.ssh"
   sudo chmod 600 "$GIT_REFERENCE_DIR/.ssh/authorized_keys"
   apply_reference_files
@@ -53,21 +52,25 @@ generate_authorized_keys() {
 
 assert_git_file_unchanged() {
   run sudo diff "$GIT_REFERENCE_DIR/$1" "$GIT_DIR/$1"
+  echo "$output"
   [ "$status" -eq 0 ]
 }
 
 assert_ssh_file_unchanged() {
   run sudo diff "$SSH_REFERENCE_DIR/$1" "$SSH_DIR/$1"
+  echo "$output"
   [ "$status" -eq 0 ]
 }
 
 assert_file_exists() {
-  run /bin/bash -c "[[ -f "$1" ]]"
+  run sudo bash -c "[[ -f $1 ]]"
+  echo "$output"
   [ "$status" -eq 0 ]
 }
 
 @test "sshd runs ok" {
   run docker run --rm $IMAGE -T
+  echo "$output"
   [ "$status" -eq 0 ]
 }
 
@@ -143,21 +146,23 @@ assert_file_exists() {
   generate_authorized_keys
   container="$(docker create \
     --interactive \
-    --volume "$SSH_DIR":/etc/ssh \
-    --volume "$GIT_DIR":/var/git \
+    --volume "$SSH_DIR:/etc/ssh" \
+    --volume "$GIT_DIR:/var/git" \
     "$IMAGE")"
   docker start "$container"
   run docker run \
-    --volume "$GIT_REFERENCE_DIR":/git \
+    --rm \
+    --volume "$GIT_REFERENCE_DIR:/git" \
     --entrypoint /bin/bash \
-    --link "$container":git \
+    --link "$container:git" \
     "$IMAGE" -xc '\
       mkdir -p ~/.ssh && \
       cp /git/id_rsa ~/.ssh/id_rsa && \
-      ssh-keyscan -t ecdsa git >>~/.ssh/known_hosts && \
+      cp /git/id_rsa.pub ~/.ssh/id_rsa.pub && \
       chmod 700 ~/.ssh && \
       chmod 600 ~/.ssh/id_rsa && \
-      ssh git@git git init --bare test.git && \
+      ssh-keyscan -t ecdsa git >>~/.ssh/known_hosts && \
+      ssh -v git@git git init --bare test.git && \
       git clone git@git:test.git ~/test && \
       cd ~/test && \
       touch README.md && \
@@ -167,5 +172,6 @@ assert_file_exists() {
       git commit -m "Initial commit" && \
       git push origin master'
   docker rm --force --volumes "$container"
+  echo "$output"
   [ "$status" -eq 0 ]
 }

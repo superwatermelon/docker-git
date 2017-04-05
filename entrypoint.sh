@@ -30,4 +30,7 @@ if [[ ! -f /etc/ssh/ssh_host_ed25519_key ]] ; then
     ssh-keygen -q -N '' -t ed25519 -f /etc/ssh/ssh_host_ed25519_key
 fi
 
+chown -R git:git /var/git
+chmod 700 /var/git
+
 exec /usr/sbin/sshd $@
